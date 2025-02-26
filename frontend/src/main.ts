@@ -2,13 +2,13 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import Button from "primevue/button"
-import Aura from '@primeuix/themes/aura';
-
 
 import App from './App.vue'
 import router from './router'
+
+//Primevue
 import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
 
 const app = createApp(App)
 
@@ -19,6 +19,5 @@ app.use(PrimeVue, {
         preset: Aura
     }
 });
-app.component('Button', Button);
 
 app.mount('#app')
