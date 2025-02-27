@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+// Public Routes (No Authentication Required)
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/refresh', [AuthController::class, 'refresh']);
+
+// Protected Routes (Requires Authentication)
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/user', [AuthController::class, 'user']);
+
+    Route::middleware('admin')->group(function () {
+        Route::get('/admin-dashboard', function () {
+            return response()->json(['message' => 'Welcome, Admin!']);
+        });
+    });
 });
