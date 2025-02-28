@@ -15,10 +15,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
         $credentials = $request->only('email', 'password');
+
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
+
         return $this->respondWithToken($token);
     }
 
@@ -29,7 +36,16 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return $this->respondWithToken(JWTAuth::refresh());
+        try {
+            $newToken = JWTAuth::refresh(JWTAuth::getToken());
+            return response()->json([
+                'access_token' => $newToken,
+                'token_type' => 'bearer',
+                'expires_in' => auth()->factory()->getTTL() * 60
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Token refresh failed'], 401);
+        }
     }
 
     protected function respondWithToken($token)
@@ -37,16 +53,18 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' =>  auth()->factory()->getTTL() * 60,
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user()
         ]);
     }
 
     public function user()
     {
-        return response()->json([
-            'user' => auth()->user(),
-            'is_admin' => auth()->user()->is_admin
-        ]);
+        // return response()->json([
+        //     'user' => auth()->user(),
+        //     'is_admin' => auth()->user()->is_admin
+        // ]);
+        return 'dsadsadas';
     }
 
     public function logout()
