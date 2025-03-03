@@ -3,6 +3,7 @@
     <Toast />
     <LoginCard />
   </div>
+  <router-view />
 </template>
 
 <script>

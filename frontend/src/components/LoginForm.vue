@@ -78,7 +78,7 @@ const login = async () => {
   passwordError.value = password.value.trim() === "";
 
   if (emailError.value || passwordError.value) {
-    return; // Stop login attempt if validation fails
+    return; 
   }
 
   loading.value = true;
