@@ -22,5 +22,13 @@ class AdminSeeder extends Seeder
                 'is_admin' => true
             ]
         );
+        User::updateOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'name' => 'Regular User',
+                'password' => Hash::make('user123'),
+                'is_admin' => false
+            ]
+        );
     }
 }
