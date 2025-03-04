@@ -9,12 +9,12 @@ function isAuthenticated() {
 
 const routes = [
   {
-    path: '/dashboard',
+    path: '/',
     component: DashboardView,
     meta: { requiresAuth: true }, // Protect this route
   },
   {
-    path: '/',
+    path: '/login',
     component: LoginView,
   },
 ];
@@ -27,7 +27,7 @@ const router = createRouter({
 // Navigation Guard
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated()) {
-    next('/');
+    next('/login');
   } else {
     next();
   }

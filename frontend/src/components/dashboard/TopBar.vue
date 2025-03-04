@@ -82,7 +82,7 @@ const toggleDropdown = () => {
 // Logout function
 const logout = () => {
   localStorage.removeItem('token'); // Remove token
-  router.push('/'); // Redirect to login
+  router.push('/login'); // Redirect to login
 };
 
 // Apply stored theme on load

@@ -90,7 +90,7 @@ const login = async () => {
     });
 
     localStorage.setItem("token", response.data.access_token);
-    router.push("/dashboard");
+    router.push("/");
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
