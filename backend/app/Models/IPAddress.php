@@ -10,7 +10,9 @@ class IPAddress extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'ip_address', 'label', 'comment'];
+    protected $table = 'ip_addresses';
+
+    protected $fillable = ['user_id', 'ip_address', 'label', 'comment', "ip_type"];
 
     public function user(): BelongsTo
     {

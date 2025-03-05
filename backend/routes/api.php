@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IPAddressController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,10 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 // Protected Routes (Requires Authentication)
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/ip-addresses', [IPAddressController::class, 'index']);
+    Route::post('/ip-addresses', [IPAddressController::class, 'store']);
+    Route::put('/ip-addresses/{id}', [IPAddressController::class, 'update']);
+    Route::delete('/ip-addresses/{id}', [IPAddressController::class, 'destroy']);
 
     Route::middleware('admin')->group(function () {
         Route::get('/admin-dashboard', function () {
