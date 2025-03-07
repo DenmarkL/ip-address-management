@@ -7,7 +7,8 @@ import App from './App.vue'
 import router from './router'
 
 //Tailwind
-import './assets/tailwind.css';
+// import './assets/tailwind.css';
+
 //Primevue
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';

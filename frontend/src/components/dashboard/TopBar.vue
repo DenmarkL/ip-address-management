@@ -1,5 +1,5 @@
 <template>
-    <nav class="flex items-center justify-between px-6 py-2 bg-white border-b shadow-sm dark:bg-gray-900 dark:text-white">
+    <nav class="flex items-center justify-between px-6 py-2 bg-white border-b border-green-500 shadow-sm dark:bg-gray-900 dark:text-white">
       <!-- Left Section (Logo + Menu) -->
       <div class="flex items-center space-x-4 flex-1">
         <!-- Hamburger Menu -->
@@ -14,7 +14,7 @@
       <!-- Right Section (Icons + Profile) -->
       <div class="relative">
         <!-- Theme Toggle -->
-        <Button @click="toggleTheme" :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'" class="p-button-text p-button-lg text-gray-600 hover:text-gray-800 dark:hover:text-gray-300" />
+        <!-- <Button @click="toggleTheme" :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'" class="p-button-text p-button-lg text-gray-600 hover:text-gray-800 dark:hover:text-gray-300" /> -->
   
         <!-- Profile Avatar -->
         <Avatar icon="pi pi-user" class="bg-green-500 text-white w-8 h-8 cursor-pointer" shape="circle" @click="toggleDropdown"/>
@@ -39,6 +39,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useToast } from "primevue/usetoast";
+import { useDarkMode } from "@/composables/userDarkMode"; // Import composable
 import Button from 'primevue/button';
 import Avatar from 'primevue/avatar';
 import Toast from 'primevue/toast';
@@ -49,32 +50,9 @@ const router = useRouter();
 const dropdownOpen = ref(false);
 const dropdownRef = ref(null);
 const toggleSidebar = inject("toggleSidebar");
-const isDarkMode = ref(localStorage.getItem("theme") === "dark");
+const { isDarkMode, toggleTheme } = useDarkMode(); // Use composable
 const toast = useToast();
-const inputRef = ref(null);
 
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value;
-
-  if (isDarkMode.value) {
-    document.documentElement.classList.add("dark");
-    document.body.style.backgroundColor = "#1a202c"; // Dark mode background
-    localStorage.setItem("theme", "dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-    document.body.style.backgroundColor = "white"; // Light mode background
-    localStorage.setItem("theme", "light");
-  }
-
-  toast.add({
-    severity: "info",
-    summary: "Theme Changed",
-    detail: isDarkMode.value ? "Dark Mode" : "Light Mode",
-    life: 2000,
-  });
-};
-
-// Toggle dropdown visibility
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
@@ -84,23 +62,6 @@ const logout = () => {
   localStorage.removeItem('token'); // Remove token
   router.push('/login'); // Redirect to login
 };
-
-// Apply stored theme on load
-onMounted(() => {
-  if (isDarkMode.value) {
-    document.documentElement.classList.add("dark");
-    document.body.style.backgroundColor = "#1a202c"; 
-  } else {
-    document.documentElement.classList.remove("dark");
-    document.body.style.backgroundColor = "white";
-  }
-
-  setTimeout(() => {
-    if (inputRef.value && document.activeElement === document.body) {
-      inputRef.value.focus();
-    }
-  }, 100);
-});
 
 </script>
 

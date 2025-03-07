@@ -1,15 +1,45 @@
 import axios from "axios";
+import router from '@/router';
+
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  headers: { "Content-Type": "application/json" },
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Ensures the refresh token is sent in cookies
 });
 
-let isRefreshing = false;
-let failedRequestsQueue: ((token: string) => void)[] = [];
+// Token Management Helpers
+const getAccessToken = () => localStorage.getItem('accessToken');
+const setAccessToken = (token: string) => localStorage.setItem('accessToken', token);
+const clearAuthData = () => localStorage.removeItem('accessToken');
 
+// Logout function
+const logout = async () => {
+  try {
+    await api.post('/logout'); // Notify backend to invalidate the refresh token
+  } catch (error) {
+    console.error('Logout failed:', error);
+  } finally {
+    clearAuthData();
+    router.push('/login'); // Redirect to login page
+  }
+};
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(callback: (token: string) => void) {
+  refreshSubscribers.push(callback);
+}
+
+// Attach Access Token to Requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -21,51 +51,36 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && originalRequest.url === "/login") {
-      return Promise.reject(error);
-    }
-
-    if (error.response?.status === 401) {
-      if (originalRequest._retry) {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-        return Promise.reject(error);
-      }
-
-      originalRequest._retry = true;
-
-      if (!isRefreshing) {
-        isRefreshing = true;
-
-        try {
-          const refreshResponse = await axios.post(
-            "/refresh",
-            {},
-            { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-          );
-
-          const newToken = refreshResponse.data.access_token;
-          localStorage.setItem("token", newToken);
-
-          failedRequestsQueue.forEach((callback) => callback(newToken));
-          failedRequestsQueue = [];
-
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
-      } else {
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
         return new Promise((resolve) => {
-          failedRequestsQueue.push((newToken: string) => {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          addRefreshSubscriber((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(api(originalRequest));
           });
         });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+
+        const response = await axios.post(`${API_BASE_URL}/refresh`, {}, { 
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${getAccessToken()}` } 
+        });
+        const newAccessToken = response.data.access_token;
+        setAccessToken(newAccessToken);
+        onRefreshed(newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, log out user
+        await logout();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

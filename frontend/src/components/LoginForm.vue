@@ -78,18 +78,21 @@ const login = async () => {
   passwordError.value = password.value.trim() === "";
 
   if (emailError.value || passwordError.value) {
-    return; 
+    return;
   }
 
   loading.value = true;
-  
+
   try {
-    const response = await api.post<{ access_token: string }>("/login", {
+    const response = await api.post<{ access_token: string, expires_in: string }>("/login", {
       email: email.value,
       password: password.value
     });
 
-    localStorage.setItem("token", response.data.access_token);
+    // Store the access token using the same key as in Axios interceptor
+    localStorage.setItem("accessToken", response.data.access_token);
+    localStorage.setItem('token_expiration', response.data.expires_in);
+
     router.push("/");
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
