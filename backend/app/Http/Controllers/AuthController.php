@@ -34,7 +34,7 @@ class AuthController extends Controller
         $refreshToken = JWTAuth::claims(['refresh' => true])->fromUser($user);
 
         // Store refresh token in HttpOnly cookie
-        $cookie = Cookie::make('refresh_token', $refreshToken, config('jwt.refresh_ttl'), '/', null, false, true);
+        $cookie = Cookie::make('refresh_token', $refreshToken, config('jwt.refresh_ttl'), '/', null, true, true)->withSameSite('None');
 
         return response()->json([
             'access_token' => $token,
@@ -67,9 +67,9 @@ class AuthController extends Controller
                 config('jwt.refresh_ttl'),
                 '/',
                 null,
-                false,
+                true,
                 true
-            );
+            )->withSameSite('None');
 
             return response()->json([
                 'access_token' => $newToken,
