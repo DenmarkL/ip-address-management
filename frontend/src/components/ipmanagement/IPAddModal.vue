@@ -1,90 +1,120 @@
 <template>
-    <div>
-      <!-- Header Section -->
-      <div class="flex justify-between items-center mb-4">
-        <!-- Title -->
-        <h2 class="text-2xl font-bold dark:text-white text-black">
-          IP Address Manager
-        </h2>
-        
-        <!-- Add Button (Opens Modal) -->
-        <Button 
-          label="Add IP" 
-          icon="pi pi-plus" 
-          class="p-button-success px-4 py-2 text-white"
-          @click="showDialog = true"
-        />
+  <Dialog 
+    :visible="visible"
+    @update:visible="emit('update:visible', $event)"
+    :header="mode === 'edit' ? 'Edit IP Address' : 'Add New IP'"
+    modal
+    class="w-1/3"
+  >
+    <div class="flex flex-col gap-4">
+      <div>
+        <label class="font-medium">IP Address</label>
+        <InputText v-model="ipData.ip_address" class="w-full mt-1" placeholder="Enter IP Address"/>
       </div>
-  
-      <!-- Card with IP Table -->
-      <Card class="shadow-lg w-full border-t border-green-500">
-        <template #title>IP Table</template>
-        <template #content>
-          <IPTable :ipAddresses="ipAddresses"/>
-        </template>
-      </Card>
-  
-      <!-- Add IP Modal -->
-      <Dialog v-model:visible="showDialog" header="Add New IP" modal class="w-1/3">
-        <div class="flex flex-col gap-4">
-          <div>
-            <label class="font-medium">IP Address</label>
-            <InputText v-model="newIP.ip_address" class="w-full mt-1" placeholder="Enter IP Address"/>
-          </div>
-  
-          <div>
-            <label class="font-medium">IP Type</label>
-            <Select v-model="newIP.ip_type">
-                <SelectOption v-for="type in ipTypes" :key="type.value" :value="type.value">
-                    {{ type.label }}
-                </SelectOption>
-            </Select>
-          </div>
-  
-          <div>
-            <label class="font-medium">Label</label>
-            <InputText v-model="newIP.label" class="w-full mt-1" placeholder="Optional Label"/>
-          </div>
-  
-          <div>
-            <label class="font-medium">Comment</label>
-            <Textarea v-model="newIP.comment" class="w-full mt-1" rows="2" placeholder="Optional Comment"/>
-          </div>
-        </div>
-  
-        <template #footer>
-          <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="showDialog = false"/>
-          <Button label="Add IP" icon="pi pi-check" class="p-button-success" @click="addIPAddress"/>
-        </template>
-      </Dialog>
+
+      <div>
+        <label class="font-medium">IP Type</label>
+        <Dropdown v-model="ipData.ip_type" :options="ipTypes" class="w-full mt-1" placeholder="Select IP Type"/>
+      </div>
+
+      <div>
+        <label class="font-medium">Label</label>
+        <InputText v-model="ipData.label" class="w-full mt-1" placeholder="Optional Label"/>
+      </div>
+
+      <div>
+        <label class="font-medium">Comment</label>
+        <Textarea v-model="ipData.comment" class="w-full mt-1" rows="2" placeholder="Optional Comment"/>
+      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  import IPTable from '@/components/ipmanagement/IPTable.vue';
-  import Card from 'primevue/card';
-  import Button from 'primevue/button';
-  import Dialog from 'primevue/dialog';
-  import InputText from 'primevue/inputtext';
-  import Textarea from 'primevue/textarea';
-  import Select from "primevue/select";
-  import SelectOption from "primevue/selectoption";
-  
-  const ipAddresses = ref([]);
-  const showDialog = ref(false); // Controls modal visibility
-  const newIP = ref({
-    ip_address: '',
-    ip_type: null,
-    label: '',
-    comment: ''
-  });
-  
-  const ipTypes = ref([
-    { label: 'IPv4', value: 'IPv4' },
-    { label: 'IPv6', value: 'IPv6' }
-  ]);
-  
-  </script>
-  
+
+    <template #footer>
+      <Button 
+        label="Cancel" 
+        icon="pi pi-times" 
+        class="p-button-text" 
+        @click="emit('update:visible', false)" 
+      />
+      <Button 
+        :label="mode === 'edit' ? 'Update IP' : 'Add IP'"
+        :icon="mode === 'edit' ? 'pi pi-check' : 'pi pi-plus'"
+        class="p-button-success"
+        @click="handleSubmit"
+      />
+    </template>
+  </Dialog>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Dropdown from 'primevue/dropdown';
+import Button from 'primevue/button';
+import api from "@/services/auth";
+import { useToast } from 'primevue/usetoast';
+
+const props = defineProps({
+  visible: Boolean,
+  mode: {
+    type: String,
+    default: 'add' // 'add' or 'edit'
+  },
+  ipData: {
+    type: Object,
+    default: () => ({ ip_address: '', ip_type: null, label: '', comment: '' })
+  },
+  ipTypes: Array
+});
+
+const emit = defineEmits(['update:visible', 'ipAdded', 'ipUpdated']);
+const toast = useToast();
+
+const handleSubmit = async () => {
+  try {
+    if (props.mode === 'add') {
+      const response = await api.post('/ip-addresses', props.ipData);
+      emit('ipAdded', response.data.data);
+      toast.add({ severity: 'success', summary: 'Success', detail: 'IP Address added successfully!', life: 3000 });
+    } else {
+      const response = await api.put(`/ip-addresses/${props.ipData.id}`, props.ipData);
+      emit('ipUpdated', response.data.data);
+      toast.add({ severity: 'success', summary: 'Success', detail: 'IP Address updated successfully!', life: 3000 });
+    }
+    emit('update:visible', false);
+  } catch (error) {
+    if (error.response && error.response.data) {
+      const { errors, message } = error.response.data;
+
+      // Display each error in a separate toast
+      if (errors) {
+        Object.entries(errors).forEach(([field, messages]) => {
+          messages.forEach((msg) => {
+            toast.add({
+              severity: 'error',
+              summary: `Error in ${field}`,
+              detail: msg,
+              life: 5000
+            });
+          });
+        });
+      } else if (message) {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: message,
+          life: 5000
+        });
+      }
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'An unexpected error occurred',
+        life: 5000
+      });
+    }
+  }
+};
+</script>
