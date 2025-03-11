@@ -96,8 +96,8 @@ class AuthController extends Controller
     public function user()
     {
         return response()->json([
-            'user' => auth()->user(),
-            'is_admin' => auth()->user()->is_admin
+            'is_admin' => auth()->user()->is_admin,
+            'user_id' => auth()->user()->id
         ]);
     }
 

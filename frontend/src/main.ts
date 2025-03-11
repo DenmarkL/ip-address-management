@@ -2,12 +2,9 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-
 import App from './App.vue'
 import router from './router'
-
-//Tailwind
-// import './assets/tailwind.css';
+import { useAuthStore } from '@/stores/AuthStore';
 
 //Primevue
 import PrimeVue from 'primevue/config';
@@ -17,8 +14,10 @@ import Toast from 'primevue/toast'
 import 'primeicons/primeicons.css'; 
 
 const app = createApp(App)
-
 app.use(createPinia())
+const authStore = useAuthStore();
+authStore.fetchUserRole();
+
 app.use(router)
 app.use(PrimeVue, {
     theme: {

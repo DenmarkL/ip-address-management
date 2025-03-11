@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/AuthStore';
 import LoginView from '@/views/LoginView.vue';
 import DashboardView from '@/views/DashboardView.vue';
 import IPManagement from '@/views/IPManagement.vue';
+import AuditLogs from '@/views/AuditLogsView.vue';
 
 // Function to check if user is authenticated
 function isAuthenticated() {
-  return !!localStorage.getItem('accessToken'); // Check if token exists
+  return !!localStorage.getItem('accessToken');
 }
 
 const routes = [
@@ -18,11 +20,16 @@ const routes = [
     component: DashboardView,
     meta: { requiresAuth: true },
     children: [
-      { path: '', component: IPManagement }, // Default dashboard home
-      { path: 'ip-management', component: IPManagement }, // Load inside dashboard
+      { path: '', component: IPManagement }, 
+      { path: 'ip-management', component: IPManagement },
+      { 
+        path: 'audit-logs', 
+        component: AuditLogs, 
+        meta: { requiresAdmin: true } 
+      },
     ],
   },
-  { path: '/', redirect: '/dashboard' }, // Redirect to dashboard by default
+  { path: '/', redirect: '/dashboard' },
 ];
 
 const router = createRouter({
@@ -32,8 +39,12 @@ const router = createRouter({
 
 // Navigation Guard
 router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
   if (to.meta.requiresAuth && !isAuthenticated()) {
     next('/login');
+  } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next('/dashboard');
   } else {
     next();
   }

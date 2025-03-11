@@ -25,12 +25,12 @@
         </li>
 
         <!-- UI Components Header (Hide when collapsed) -->
-        <li v-if="!isCollapsed" class="text-xs uppercase text-gray-500 dark:text-gray-400 px-4 pt-4">Admin Settings</li>
+        <li v-if="authStore.isAdmin && !isCollapsed" class="text-xs uppercase text-gray-500 dark:text-gray-400 px-4 pt-4">Admin Settings</li>
 
         <!-- Audit Logs -->
-        <li>
+        <li v-if="authStore.isAdmin">
           <router-link 
-            to="/" 
+            to="/dashboard/audit-logs" 
             class="flex items-center px-4 py-2 rounded-md transition-all"
             :class="[
               isCollapsed ? 'justify-center' : 'justify-start',
@@ -51,7 +51,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useAuthStore } from '@/stores/AuthStore';
 
+const authStore = useAuthStore();
 const route = useRoute();
 const isCollapsed = ref(localStorage.getItem("sidebarCollapsed") === "true");
 

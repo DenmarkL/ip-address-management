@@ -20,6 +20,7 @@ class IPAddressResource extends JsonResource
             'ip_type' => $this->ip_type, // Return IPv4 or IPv6
             'label' => $this->label,
             'comment' => $this->comment,
+            'user_id' => $this->user->id
             // 'user' => [
             //     'id' => $this->user->id,
             //     'name' => $this->user->name,

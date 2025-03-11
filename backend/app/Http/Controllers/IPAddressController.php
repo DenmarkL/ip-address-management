@@ -32,7 +32,7 @@ class IPAddressController extends Controller
 
         // Fetch results and hide unnecessary fields
         return IPAddressResource::collection(
-            $query->get()->makeHidden(['user', 'created_at'])
+            $query->get()->makeHidden(['created_at'])
         );
     }
 

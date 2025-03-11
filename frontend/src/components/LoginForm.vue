@@ -59,6 +59,7 @@ import Button from 'primevue/button';
 import api from "../services/auth";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { useAuthStore } from '@/stores/AuthStore';
 
 const email = ref<string>("");
 const password = ref<string>("");
@@ -67,6 +68,7 @@ const passwordError = ref<boolean>(false);
 const loginError = ref<string | null>(null);
 const loading = ref<boolean>(false);
 const router = useRouter();
+const authStore = useAuthStore();
 
 const validateEmail = () => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,6 +95,8 @@ const login = async () => {
     localStorage.setItem("accessToken", response.data.access_token);
     localStorage.setItem('token_expiration', response.data.expires_in);
 
+    await authStore.fetchUserRole();
+    
     router.push("/");
   } catch (error: any) {
     if (axios.isAxiosError(error)) {

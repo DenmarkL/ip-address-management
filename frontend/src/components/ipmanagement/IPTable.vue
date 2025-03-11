@@ -22,11 +22,13 @@
                     icon="pi pi-pencil" 
                     class="p-button-rounded p-button-warning p-button-sm mr-2"
                     @click="$emit('edit', slotProps.data)"
+                    v-if="authStore.isAdmin || authStore.userId == slotProps.data.user_id"
                 />
                 <Button 
                     icon="pi pi-trash" 
                     class="p-button-rounded p-button-danger p-button-sm"
                     @click="$emit('delete', slotProps.data.id)"
+                    v-if="authStore.isAdmin"
                 />
             </template>
         </Column>
@@ -38,6 +40,9 @@ import { defineProps } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from 'primevue/button';
+import { useAuthStore } from '@/stores/AuthStore';
+
+const authStore = useAuthStore();
 
 defineProps({
     ipAddresses: {
