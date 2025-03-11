@@ -12,10 +12,10 @@
         <InputText v-model="ipData.ip_address" class="w-full mt-1" placeholder="Enter IP Address"/>
       </div>
 
-      <div>
+      <!-- <div>
         <label class="font-medium">IP Type</label>
         <Dropdown v-model="ipData.ip_type" :options="ipTypes" class="w-full mt-1" placeholder="Select IP Type"/>
-      </div>
+      </div> -->
 
       <div>
         <label class="font-medium">Label</label>

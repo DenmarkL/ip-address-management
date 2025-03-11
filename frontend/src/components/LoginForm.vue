@@ -97,7 +97,7 @@ const login = async () => {
 
     await authStore.fetchUserRole();
     
-    router.push("/");
+    router.push("/dashboard/ip-management");
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {

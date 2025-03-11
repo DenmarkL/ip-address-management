@@ -45,6 +45,7 @@ import Avatar from 'primevue/avatar';
 import Toast from 'primevue/toast';
 import { inject } from "vue";
 import { useRouter } from 'vue-router';
+import api from "@/services/auth";
 
 const router = useRouter();
 const dropdownOpen = ref(false);
@@ -59,8 +60,19 @@ const toggleDropdown = () => {
 
 // Logout function
 const logout = () => {
-  localStorage.removeItem('token'); // Remove token
-  router.push('/login'); // Redirect to login
+  try {
+    const response = api.post('/logout');
+  } catch (error) {
+    console.error("Error fetching IP addresses:", error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to Log out.',
+      life: 4000
+    });
+  }
+  localStorage.removeItem('token'); 
+  router.push('/login'); 
 };
 
 </script>

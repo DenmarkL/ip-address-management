@@ -12,9 +12,9 @@
           <router-link 
             to="/dashboard/ip-management" 
             class="flex items-center px-4 py-2 rounded-md transition-all"
-            :class="[
+            :class="[ 
               isCollapsed ? 'justify-center' : 'justify-start',
-              route.path.startsWith('/dashboard') 
+              route.path.startsWith('/dashboard/ip-management')
                 ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white' 
                 : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
             ]"
@@ -34,7 +34,7 @@
             class="flex items-center px-4 py-2 rounded-md transition-all"
             :class="[
               isCollapsed ? 'justify-center' : 'justify-start',
-              route.path === '/' 
+              route.path.startsWith('/dashboard/audit-logs') 
                 ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white' 
                 : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
             ]"

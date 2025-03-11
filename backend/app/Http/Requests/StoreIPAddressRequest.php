@@ -22,7 +22,7 @@ class StoreIPAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ip_address' => ['required', 'ip'],
+            'ip_address' => ['required', 'ip', 'unique:ip_addresses,ip_address'],
             'label' => ['required', 'string', 'max:255'],
             'comment' => ['nullable', 'string'],
             'ip_type' => ['nullable', 'string', 'in:IPv4,IPv6'],

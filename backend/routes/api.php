@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IPAddressController;
 use Illuminate\Http\Request;
@@ -34,8 +35,6 @@ Route::middleware(['auth:api', 'audit.log'])->group(function () {
     Route::delete('/ip-addresses/{id}', [IPAddressController::class, 'destroy']);
 
     Route::middleware('admin')->group(function () {
-        Route::get('/admin-dashboard', function () {
-            return response()->json(['message' => 'Welcome, Admin!']);
-        });
+        Route::get('/audit-logs', [AuditLogController::class, 'index']);
     });
 });

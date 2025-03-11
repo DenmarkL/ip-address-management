@@ -21,13 +21,13 @@
                 <Button 
                     icon="pi pi-pencil" 
                     class="p-button-rounded p-button-warning p-button-sm mr-2"
-                    @click="$emit('edit', slotProps.data)"
+                    @click="$emit('edit', slotProps.data)" 
                     v-if="authStore.isAdmin || authStore.userId == slotProps.data.user_id"
                 />
                 <Button 
                     icon="pi pi-trash" 
                     class="p-button-rounded p-button-danger p-button-sm"
-                    @click="$emit('delete', {id: slotProps.data.id, ip:slotProps.data})"
+                    @click="$emit('delete', { id: slotProps.data.ip_id, ip: slotProps.data })"
                     v-if="authStore.isAdmin"
                 />
             </template>

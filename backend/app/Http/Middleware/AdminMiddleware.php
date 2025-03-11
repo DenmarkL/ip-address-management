@@ -15,9 +15,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user() && auth()->user()->is_admin) {
-            return $next($request);
+        if (!auth()->user() || !auth()->user()->is_admin) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
-        return response()->json(['message' => 'Unauthorized'], 403);
+
+        return $next($request);
     }
 }

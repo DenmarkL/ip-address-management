@@ -22,11 +22,7 @@ const routes = [
     children: [
       { path: '', component: IPManagement }, 
       { path: 'ip-management', component: IPManagement },
-      { 
-        path: 'audit-logs', 
-        component: AuditLogs, 
-        meta: { requiresAdmin: true } 
-      },
+      { path: 'audit-logs', component: AuditLogs, meta: { requiresAdmin: true } },
     ],
   },
   { path: '/', redirect: '/dashboard' },
@@ -37,9 +33,15 @@ const router = createRouter({
   routes,
 });
 
+
 // Navigation Guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+
+  // Ensure user role is fetched before proceeding
+  if (!authStore.isAdmin && isAuthenticated()) {
+    await authStore.fetchUserRole();
+  }
 
   if (to.meta.requiresAuth && !isAuthenticated()) {
     next('/login');
