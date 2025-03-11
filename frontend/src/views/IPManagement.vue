@@ -92,12 +92,6 @@ const handleEdit = (ip) => {
 // Handle New IP Added
 const handleIPAdded = (newIP) => {
   ipAddresses.value.push(newIP);
-  toast.add({
-    severity: 'success',
-    summary: 'Success',
-    detail: 'IP Address added successfully!',
-    life: 3000
-  });
 };
 
 // Handle Updated IP Data
@@ -106,19 +100,16 @@ const handleIPUpdated = (updatedIP) => {
   if (index !== -1) {
     ipAddresses.value[index] = updatedIP;
   }
-  toast.add({
-    severity: 'success',
-    summary: 'Success',
-    detail: 'IP Address updated successfully!',
-    life: 3000
-  });
 };
 
 // Handle Deleting an IP
-const handleDelete = async (id) => {
+const handleDelete = async (data) => {
+  const transformedData = { ...data.ip, id: data.id };
   try {
-    await api.delete(`/ip-addresses/${id}`);
-    ipAddresses.value = ipAddresses.value.filter(ip => ip.id !== id);
+    await api.delete(`/ip-addresses/${data.id}`, {
+      data: transformedData
+    });
+    ipAddresses.value = ipAddresses.value.filter(ip => ip.id !== data.id);
 
     toast.add({
       severity: 'success',

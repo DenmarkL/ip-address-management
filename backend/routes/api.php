@@ -25,7 +25,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
 // Protected Routes (Requires Authentication)
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:api', 'audit.log'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/ip-addresses', [IPAddressController::class, 'index']);

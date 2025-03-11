@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeleteRequest;
 use App\Http\Requests\StoreIPAddressRequest;
 use App\Http\Requests\UpdateIPAddressRequest;
 use App\Http\Resources\IPAddressResource;
@@ -79,16 +80,14 @@ class IPAddressController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(DeleteRequest $request, string $id)
     {
         $ipAddress = IPAddress::findOrFail($id);
-
-        if (!Auth::user()->isSuperAdmin()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $ipAddress->delete();
 
-        return response()->json(['message' => 'Deleted successfully']);
+        return response()->json([
+            'message' => 'Deleted successfully',
+            'data' => ['id' => $id]
+        ]);
     }
 }

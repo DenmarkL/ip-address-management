@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\User;
@@ -35,6 +36,12 @@ class AuthController extends Controller
 
         // Store refresh token in HttpOnly cookie
         $cookie = Cookie::make('refresh_token', $refreshToken, config('jwt.refresh_ttl'), '/', null, true, true)->withSameSite('None');
+
+        AuditLog::create([
+            'user_id' => auth()->user()->id,
+            'action' => 'login',
+            'details' => 'User logged in'
+        ]);
 
         return response()->json([
             'access_token' => $token,
@@ -101,8 +108,14 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        AuditLog::create([
+            'user_id' => auth()->user()->id,
+            'action' => 'logout',
+            'details' => 'User logged out'
+        ]);
+
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out'])

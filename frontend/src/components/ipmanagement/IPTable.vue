@@ -27,7 +27,7 @@
                 <Button 
                     icon="pi pi-trash" 
                     class="p-button-rounded p-button-danger p-button-sm"
-                    @click="$emit('delete', slotProps.data.id)"
+                    @click="$emit('delete', {id: slotProps.data.id, ip:slotProps.data})"
                     v-if="authStore.isAdmin"
                 />
             </template>
