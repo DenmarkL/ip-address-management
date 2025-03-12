@@ -116,11 +116,11 @@ const handleDelete = async (data) => {
     accept: async () => {
       const transformedData = { ...data.ip, id: data.id };
       try {
-        await api.delete(`/ip-addresses/${data.id}`, {
+        await api.delete(`/ip-addresses/${data.ip.id}`, {
           data: transformedData
         });
 
-        ipAddresses.value = ipAddresses.value.filter(ip => ip.id !== data.id);
+        ipAddresses.value = ipAddresses.value.filter(ip => ip.id !== data.ip.id);
 
         toast.add({
           severity: 'success',
