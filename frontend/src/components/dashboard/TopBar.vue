@@ -71,7 +71,7 @@ const logout = () => {
       life: 4000
     });
   }
-  localStorage.removeItem('token'); 
+  localStorage.clear();
   router.push('/login'); 
 };
 

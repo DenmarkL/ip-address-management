@@ -1,5 +1,6 @@
 import axios from "axios";
 import router from '@/router';
+import { useAuthStore } from "@/stores/AuthStore";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -74,9 +75,12 @@ api.interceptors.response.use(
         setAccessToken(newAccessToken);
         onRefreshed(newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        const authStore = useAuthStore();
+        authStore.fetchUserRole();
         return api(originalRequest);
       } catch (refreshError) {
         // If refresh fails, log out user
+        localStorage.clear();
         await logout();
         return Promise.reject(refreshError);
       } finally {

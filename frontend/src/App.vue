@@ -6,12 +6,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import ConfirmDialog from 'primevue/confirmdialog';
-// import { authService } from '@/services/refresh';
-
-//Refresh access token when the app loads
-// onMounted(async () => {
-//     await authService.refreshAccessToken();
-// });
 
 onMounted(() => {
   const shouldReload = localStorage.getItem('shouldReload');
